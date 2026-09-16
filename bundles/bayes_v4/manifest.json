@@ -3,7 +3,7 @@
   "dorgems_version": "0.1.0",
   "files": {
     "posterior.npz": "614ded22aaa41f76ed6214df032978279d25191ec5711a9ffe0e352d185297cd",
-    "scaler.json": "44af297a86d9389e7817d18034c1f41957d879838d482a953f61a4c6e66b2c82"
+    "scaler.json": "97932991743d39416299df20a49e79cf099c278bb15e514865144b7deea37159"
   },
   "model": "bayes_hier_v4",
   "training_table": "dor_scm_final.csv",
@@ -22,5 +22,6 @@
     "min_ess_bulk": 860.0
   },
   "pymc_version": "5.25.1",
-  "created_at": "2026-09-02T09:48:22.733136+00:00"
+  "created_at": "2026-09-02T09:48:22.733136+00:00",
+  "_dorgems_local_note": "scaler.json hash corrected 2026-09-16 by GB: the hash originally shipped in this manifest (44af297a...) does not match scaler.json as actually committed to solmoipark/DoR (verified against raw.githubusercontent.com, byte-identical to the local file). Same upstream provenance bug as bundles/gbm_v6/manifest.json. posterior.npz was untouched and already matched. No model weights were altered."
 }

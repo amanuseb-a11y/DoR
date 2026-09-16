@@ -1,0 +1,6 @@
+# Frozen model/bundle artifacts must never be altered by line-ending conversion
+# (e.g. Windows core.autocrlf) or Git's diff/merge machinery. Added by GB during
+# baseline setup after discovering bundles/gbm_v6/model.txt got CRLF-corrupted
+# on checkout (see docs history / chat log for 2026-09-16).
+bundles/** binary
+data/*.db binary

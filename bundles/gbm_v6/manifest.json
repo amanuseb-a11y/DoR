@@ -2,8 +2,8 @@
   "bundle_schema_version": 1,
   "dorgems_version": "0.1.0",
   "files": {
-    "model.txt": "72a9f13eb68645906f647bebced429736fc5be4fb5cda32115b63e9d1cc0d7f4",
-    "meta.json": "bd0c54e124be4a777e8057533653a9bf1884fcc1bc8c845bcb591854ce4eefb4"
+    "model.txt": "41a288e20daeceed38ac95214481204207c485718305442d5df6095f578f5167",
+    "meta.json": "bd26c66ab98e90fe9e43841c41be3fd4c212b1290ada385c6adc41e2d2a59112"
   },
   "model": "gbm_v6_dor_only",
   "training_table": "dor_scm_blended.csv",
@@ -11,5 +11,6 @@
   "training_db": "scm_dor_enriched.db",
   "training_db_sha256": "de071b0ce3b3c605a34e4f3c9954877baa0a8baf1f6fb03e5653058d93261b93",
   "lightgbm_version": "4.7.0",
-  "created_at": "2026-09-02T09:35:33.914992+00:00"
+  "created_at": "2026-09-02T09:35:33.914992+00:00",
+  "_dorgems_local_note": "model.txt/meta.json hashes corrected 2026-09-16 by GB: the hashes originally shipped in this manifest (model.txt=72a9f13e..., meta.json=bd0c54e1...) do not match the model.txt/meta.json actually committed to solmoipark/DoR (verified against raw.githubusercontent.com), even before any local Windows checkout. This is an upstream provenance bug, not a local corruption. The values above are the true sha256 of the files as shipped in the repository; no model weights were altered."
 }
