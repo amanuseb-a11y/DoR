@@ -97,12 +97,11 @@ def predict(
     # bayes/gbm/ensemble result untouched, just with a warning added. -------
     my_model_block: dict[str, Any] | None = None
     try:
-        from .models.my_model import predict_my_model
+        from .models.my_model import predict_my_models
 
-        my_alpha = predict_my_model(feats, ages_arr, mix=mix_m)
         my_model_block = {
-            "alpha_pct": my_alpha.tolist(),
-            "model": "pinn_v1 (GB, ml_master_DoR_dataset_v13_1.xlsx, Test R^2=0.844)",
+            "models": predict_my_models(feats, ages_arr, mix=mix_m),
+            "source": "GB, ml_master_DoR_dataset_v13_1.xlsx",
             "note": "Not yet blended into 'recommended' or 'ensemble' -- reported alongside for comparison.",
         }
     except Exception as e:  # noqa: BLE001

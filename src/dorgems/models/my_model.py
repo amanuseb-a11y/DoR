@@ -1,10 +1,13 @@
-"""GB's trained model, wired into DoRGems (Step 12+).
+"""GB's trained models, wired into DoRGems (Step 12+).
 
-Loads bundles/my_model_v1/deploy_bundle.pkl -- a PINN (physics-informed
-neural net) trained on GB's own 7-model benchmarking pipeline
-(dor_ml_pipeline_v2_with_pinn), fit on ml_master_DoR_dataset_v13_1.xlsx.
-Confirmed Test R^2 = 0.844 (best of the 7 models: linreg 0.616, rf 0.783,
-xgb 0.835, mlp 0.832, cnn 0.746, grnn 0.816, pinn 0.844).
+Loads bundles/my_model_v1/deploy_bundle.pkl -- five of GB's own 7-model
+benchmarking pipeline (dor_ml_pipeline_v2_with_pinn), fit on
+ml_master_DoR_dataset_v13_1.xlsx: PINN (physics-informed, best performer),
+XGBoost, Random Forest, MLP, and Linear Regression (the simplest baseline).
+Confirmed Test R^2 on the full 7-model benchmark: linreg 0.616, rf 0.783,
+xgb 0.835, mlp 0.832, cnn 0.746, grnn 0.816, pinn 0.844 -- only CNN and GRNN
+are not wired in live here (each has its own bespoke architecture that would
+need its own inference-only port, same treatment PINN's main_net got).
 
 This module is entirely self-contained inside DoR/ (no dependency on the
 Desktop pipeline folder at runtime) -- everything it needs (the fitted
@@ -59,15 +62,34 @@ _DOSE_KEYS = ["CaO", "SiO2", "Al2O3", "Fe2O3", "MgO", "SO3"]
 _SYSTEM_KEYS = ["CaO", "SiO2", "Al2O3", "Fe2O3", "MgO", "SO3", "Na2O", "K2O", "TiO2", "LOI"]
 
 
+MODEL_TEST_R2 = {
+    "pinn": 0.844,
+    "xgb": 0.835,
+    "mlp": 0.832,
+    "rf": 0.783,
+    "grnn": 0.816,
+    "cnn": 0.746,
+    "linreg": 0.616,
+}
+MODEL_LABELS = {
+    "pinn": "PINN (physics-informed)",
+    "xgb": "XGBoost",
+    "rf": "Random Forest",
+    "mlp": "MLP",
+    "linreg": "Linear Regression",
+}
+DEFAULT_MODELS = ("pinn", "xgb", "rf", "mlp", "linreg")
+
+
 def _get_predictor():
     global _PREDICTOR
     if _PREDICTOR is None:
-        from .pinn_infer import PinnPredictor
+        from .pinn_infer import MultiModelPredictor
 
         bundle_path = repo_root() / "bundles" / "my_model_v1" / "deploy_bundle.pkl"
         if not bundle_path.is_file():
             raise FileNotFoundError(f"my_model bundle not found at {bundle_path}")
-        _PREDICTOR = PinnPredictor(bundle_path)
+        _PREDICTOR = MultiModelPredictor(bundle_path)
     return _PREDICTOR
 
 
@@ -155,11 +177,27 @@ def feats_to_my_model_row(feats: dict, mix: Any = None) -> dict[str, Any]:
 
 
 def predict_my_model(feats: dict, ages, mix: Any = None) -> np.ndarray:
-    """DoR(%) curve from GB's trained PINN, given a DoRGems
-    scm_input_to_features() dict, an array of ages (days), and optionally
-    the MixSpec (for mix.opc_oxides -- see module docstring). Returns one
-    DoR% per age, clipped to [0, 100]."""
+    """Back-compat: DoR(%) curve from the PINN alone. See predict_my_models()
+    for the multi-model version used by predict.py now."""
     predictor = _get_predictor()
     row = feats_to_my_model_row(feats, mix=mix)
-    curve = predictor.predict_curve(row, ages)
+    curve = predictor.predict_curve(row, ages, model="pinn")
     return np.clip(curve, 0.0, 100.0)
+
+
+def predict_my_models(feats: dict, ages, mix: Any = None, models=DEFAULT_MODELS) -> dict[str, Any]:
+    """DoR(%) curves from several of GB's trained models at once (same
+    row/features, same fitted preprocessor -- see pinn_infer.MultiModelPredictor).
+    Returns {model_key: {"alpha_pct": [...], "label": ..., "test_r2": ...}}.
+    `models` may include 'pinn', 'linreg', 'mlp' (whatever's in the bundle)."""
+    predictor = _get_predictor()
+    row = feats_to_my_model_row(feats, mix=mix)
+    out: dict[str, Any] = {}
+    for key in models:
+        curve = np.clip(predictor.predict_curve(row, ages, model=key), 0.0, 100.0)
+        out[key] = {
+            "alpha_pct": curve.tolist(),
+            "label": MODEL_LABELS.get(key, key),
+            "test_r2": MODEL_TEST_R2.get(key),
+        }
+    return out
