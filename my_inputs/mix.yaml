@@ -1,0 +1,5 @@
+scm_pct: 40
+w_b: 0.45
+curing_temp_C: 20
+opc_oxides: {CaO: 63.3, SiO2: 20.2, Al2O3: 5.0, Fe2O3: 3.0, MgO: 1.8, SO3: 3.0, Na2O: 0.2, K2O: 0.8}
+other_components: {}

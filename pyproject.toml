@@ -22,6 +22,7 @@ kernel = ["inverse-gems"]
 pilot = ["gemspilot", "mcp>=1.2", "pydantic>=2"]
 export = ["arviz", "pymc", "scikit-learn"]
 test = ["pytest", "pydantic>=2", "scikit-learn"]
+my_model = ["torch", "scikit-learn"]
 
 [project.scripts]
 dorgems = "dorgems.cli:main"

@@ -90,6 +90,24 @@ def predict(
         warnings.append("gbm bundle missing; ensemble falls back to bayes")
         mode = "bayes"
 
+    # --- GB's trained model (PINN; additional 8th source, not yet blended
+    # into 'ensemble'/'recommended' -- see models/my_model.py docstring for
+    # what it is and its known input-schema limitations). Never fatal: if the
+    # bundle or torch isn't available, predict() still returns the original
+    # bayes/gbm/ensemble result untouched, just with a warning added. -------
+    my_model_block: dict[str, Any] | None = None
+    try:
+        from .models.my_model import predict_my_model
+
+        my_alpha = predict_my_model(feats, ages_arr, mix=mix_m)
+        my_model_block = {
+            "alpha_pct": my_alpha.tolist(),
+            "model": "pinn_v1 (GB, ml_master_DoR_dataset_v13_1.xlsx, Test R^2=0.844)",
+            "note": "Not yet blended into 'recommended' or 'ensemble' -- reported alongside for comparison.",
+        }
+    except Exception as e:  # noqa: BLE001
+        warnings.append(f"my_model unavailable: {e}")
+
     # --- ensemble -------------------------------------------------------------
     ens_block: dict[str, Any] = {"mode": mode}
     recommended_source = "bayes"
@@ -156,6 +174,7 @@ def predict(
         "beta_shape": bundle.bayes.beta_shape,
         "bayes": bayes_block,
         "gbm": gbm_block,
+        "my_model": my_model_block,
         "ensemble": ens_block,
         "recommended": recommended,
         "ood": ood,

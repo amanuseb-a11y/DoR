@@ -1,0 +1,8 @@
+# Test case 2: Class F fly ash, 30% replacement (different SCM type from the
+# slag test, to check the model generalizes across material classes).
+name: FlyAsh-ClassF-test
+role: fly_ash
+oxides: {SiO2: 52.0, CaO: 5.0, Al2O3: 26.0, Fe2O3: 8.0, MgO: 1.5, SO3: 0.5, Na2O: 0.5, K2O: 1.5, TiO2: 1.2}
+blaine_m2_kg: 380
+d50_um: 15.0
+amorphous_pct: 85.0
